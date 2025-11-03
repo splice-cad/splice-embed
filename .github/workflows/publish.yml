@@ -11,8 +11,7 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
-      id-token: write # Required for npm provenance
+      contents: write # Required for creating releases
 
     steps:
       - name: Checkout code
@@ -35,7 +34,7 @@ jobs:
         run: npm version ${{ github.event.inputs.version }} --no-git-tag-version
 
       - name: Publish to npm
-        run: npm publish --access public --provenance
+        run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
