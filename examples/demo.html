@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Splice Embed - Demo</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      color: white;
+      margin-bottom: 30px;
+    }
+
+    h1 {
+      font-size: 3em;
+      font-weight: 700;
+      margin-bottom: 10px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .subtitle {
+      font-size: 1.2em;
+      opacity: 0.9;
+    }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    .card-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .card-title {
+      font-size: 1.5em;
+      font-weight: 600;
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+    }
+
+    button {
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+
+    button:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: translateY(-1px);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    .embed-container {
+      height: 600px;
+      background: #f5f5f5;
+      resize: both;
+      overflow: auto;
+      min-height: 400px;
+      min-width: 400px;
+    }
+
+    .config-panel {
+      padding: 20px;
+      background: #f8f9fa;
+      border-top: 1px solid #e0e0e0;
+    }
+
+    .config-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .config-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    label {
+      font-weight: 600;
+      font-size: 14px;
+      color: #333;
+    }
+
+    input[type="text"],
+    select {
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+    }
+
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .update-btn {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border: none;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .update-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    .info {
+      background: #e3f2fd;
+      border-left: 4px solid #2196F3;
+      padding: 15px;
+      margin-top: 20px;
+      border-radius: 4px;
+    }
+
+    .info strong {
+      color: #1976D2;
+    }
+
+    code {
+      background: #f5f5f5;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.9em;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🔌 Splice Embed Demo</h1>
+      <p class="subtitle">Interactive harness diagram embeds for your website</p>
+    </header>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Embedded Harness Viewer</div>
+        <div class="controls">
+          <button onclick="controller.zoomIn()" title="Zoom In (+ key)">🔍+</button>
+          <button onclick="controller.zoomOut()" title="Zoom Out (- key)">🔍-</button>
+          <button onclick="controller.fitToView()" title="Fit to View (F key)">📐</button>
+        </div>
+      </div>
+      <div id="harness-container" class="embed-container"></div>
+
+      <div class="config-panel">
+        <h3 style="margin-bottom: 15px; color: #333;">Configuration</h3>
+        <div class="config-grid">
+          <div class="config-group">
+            <label for="harness-id">Harness ID (UUID)</label>
+            <input type="text" id="harness-id" placeholder="For public harnesses" />
+          </div>
+          <div class="config-group">
+            <label for="share-token">Share Token</label>
+            <input type="text" id="share-token" placeholder="For private harnesses (32 chars)" />
+          </div>
+          <div class="config-group">
+            <label for="custom-title">Custom Title (optional)</label>
+            <input type="text" id="custom-title" placeholder="Override harness name" />
+          </div>
+          <div class="config-group">
+            <label for="canvas-color">Canvas Color</label>
+            <div style="display: flex; gap: 8px; align-items: center;">
+              <input type="color" id="canvas-color" value="#ffffff" style="width: 60px; height: 38px; border-radius: 6px; cursor: pointer;" />
+              <input type="text" id="canvas-color-text" value="#ffffff" placeholder="#ffffff" style="flex: 1;" />
+            </div>
+          </div>
+          <div class="config-group">
+            <label for="grid-color">Grid Color</label>
+            <div style="display: flex; gap: 8px; align-items: center;">
+              <input type="color" id="grid-color" value="#dddddd" style="width: 60px; height: 38px; border-radius: 6px; cursor: pointer;" />
+              <input type="text" id="grid-color-text" value="#dddddd" placeholder="#dddddd" style="flex: 1;" />
+            </div>
+          </div>
+        </div>
+
+        <div class="config-grid">
+          <div class="config-group">
+            <label for="bom-position">BOM Position</label>
+            <select id="bom-position">
+              <option value="bottom">Bottom</option>
+              <option value="top">Top</option>
+              <option value="left">Left</option>
+              <option value="right">Right</option>
+              <option value="none">Hidden</option>
+            </select>
+          </div>
+          <div class="config-group">
+            <label for="controls-position">Controls Position</label>
+            <select id="controls-position">
+              <option value="top-right">Top Right</option>
+              <option value="top-left">Top Left</option>
+              <option value="bottom-right">Bottom Right</option>
+              <option value="bottom-left">Bottom Left</option>
+            </select>
+          </div>
+          <div class="checkbox-group">
+            <input type="checkbox" id="show-grid" />
+            <label for="show-grid">Show Grid</label>
+          </div>
+          <div class="checkbox-group">
+            <input type="checkbox" id="show-title" checked />
+            <label for="show-title">Show Title</label>
+          </div>
+          <div class="checkbox-group">
+            <input type="checkbox" id="interactive" checked />
+            <label for="interactive">Interactive</label>
+          </div>
+        </div>
+
+        <button class="update-btn" onclick="updateEmbed()">🔄 Update Embed</button>
+
+        <div class="info">
+          <strong>💡 Quick Start:</strong>
+          <ol style="margin: 10px 0 0 20px;">
+            <li><strong>For public harnesses:</strong> Enter the harness UUID in the "Harness ID" field - no auth needed!</li>
+            <li><strong>For private harnesses (recommended):</strong> Use a share token
+              <ul style="margin: 5px 0 0 20px;">
+                <li>Generate via: Harness settings → "Generate Share Link"</li>
+                <li>Or API: <code>POST /api/harnesses/{id}/share</code></li>
+                <li>Copy the 32-character token and paste in the "Share Token" field</li>
+                <li>✅ Secure: Token only grants read access to one harness</li>
+                <li>✅ Revocable: Regenerate anytime without affecting your account</li>
+              </ul>
+            </li>
+            <li>Customize canvas color, grid display, and BOM position</li>
+            <li>Click "Update Embed" to reload</li>
+            <li><strong>Drag the bottom-right corner</strong> to resize the embed window</li>
+          </ol>
+          <p style="margin-top: 10px;">
+            <strong>Two ways to embed:</strong><br/>
+            1️⃣ Public harness: <code>embed('container', 'harness-uuid')</code><br/>
+            2️⃣ Private harness: <code>embed('container', 'share-token-32chars')</code> ✅ Recommended<br/><br/>
+            <strong>Keyboard shortcuts:</strong> <code>+</code> zoom in, <code>-</code> zoom out, <code>F</code> fit to view
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    // Import from local dev build
+    import { embed } from '../src/embed/index.ts?v=3';
+
+    // Make embed available globally
+    window.Splice = { embed };
+
+    // Sync canvas color picker with text input
+    const colorPicker = document.getElementById('canvas-color');
+    const colorText = document.getElementById('canvas-color-text');
+
+    colorPicker.addEventListener('input', (e) => {
+      colorText.value = e.target.value;
+    });
+
+    colorText.addEventListener('input', (e) => {
+      const value = e.target.value;
+      if (/^#[0-9A-F]{6}$/i.test(value)) {
+        colorPicker.value = value;
+      }
+    });
+
+    // Sync grid color picker with text input
+    const gridColorPicker = document.getElementById('grid-color');
+    const gridColorText = document.getElementById('grid-color-text');
+
+    gridColorPicker.addEventListener('input', (e) => {
+      gridColorText.value = e.target.value;
+    });
+
+    gridColorText.addEventListener('input', (e) => {
+      const value = e.target.value;
+      if (/^#[0-9A-F]{6}$/i.test(value)) {
+        gridColorPicker.value = value;
+      }
+    });
+
+    // Initial embed (will show error until user provides harness ID)
+    let controller = embed('harness-container', 'placeholder', {
+      apiUrl: 'http://localhost:5002',
+      width: '100%',
+      height: '600px',
+      showBOM: false,
+      bomPosition: 'bottom',
+      showTitle: true,
+      interactive: true,
+      canvasColor: '#ffffff',
+      gridColor: '#dddddd',
+      showGrid: false,
+      onLoad: (harness) => {
+        console.log('Harness loaded:', harness);
+      },
+      onError: (error) => {
+        console.error('Error loading harness:', error);
+      }
+    });
+
+    window.controller = controller;
+
+    // Update embed function
+    window.updateEmbed = function() {
+      const harnessId = document.getElementById('harness-id').value.trim();
+      const shareToken = document.getElementById('share-token').value.trim();
+      const customTitle = document.getElementById('custom-title').value;
+      const canvasColor = document.getElementById('canvas-color-text').value;
+      const gridColor = document.getElementById('grid-color-text').value;
+      const bomPosition = document.getElementById('bom-position').value;
+      const controlsPosition = document.getElementById('controls-position').value;
+      const showGrid = document.getElementById('show-grid').checked;
+      const showTitle = document.getElementById('show-title').checked;
+      const interactive = document.getElementById('interactive').checked;
+
+      // Validate that at least one is provided
+      if (!harnessId && !shareToken) {
+        alert('Please provide either a Harness ID or Share Token');
+        return;
+      }
+
+      // Use share token if provided, otherwise use harness ID
+      const idOrToken = shareToken || harnessId;
+
+      // Destroy old embed
+      controller.destroy();
+
+      // Create new embed
+      controller = embed('harness-container', idOrToken, {
+        apiUrl: 'http://localhost:5002',
+        width: '100%',
+        height: '600px',
+        showBOM: bomPosition !== 'none',
+        bomPosition: bomPosition !== 'none' ? bomPosition : undefined,
+        showTitle,
+        title: customTitle || undefined,
+        interactive,
+        controlsPosition,
+        canvasColor,
+        gridColor,
+        showGrid,
+        onLoad: (harness) => {
+          console.log('Harness loaded:', harness);
+        },
+        onError: (error) => {
+          console.error('Error loading harness:', error);
+        }
+      });
+
+      window.controller = controller;
+    };
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+      if (e.target.tagName === 'INPUT') return; // Don't trigger when typing
+
+      if (e.key === '+' || e.key === '=') {
+        controller.zoomIn();
+        e.preventDefault();
+      }
+      if (e.key === '-' || e.key === '_') {
+        controller.zoomOut();
+        e.preventDefault();
+      }
+      if (e.key === 'f' || e.key === 'F') {
+        controller.fitToView();
+        e.preventDefault();
+      }
+    });
+  </script>
+</body>
+</html>
