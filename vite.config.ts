@@ -17,6 +17,7 @@ export default defineConfig({
       external: [],
       output: {
         globals: {},
+        exports: 'named',
       },
     },
     sourcemap: true,
