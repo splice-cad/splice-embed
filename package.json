@@ -1,6 +1,6 @@
 {
   "name": "@splice-cad/embed",
-  "version": "0.1.0-beta.1",
+  "version": "0.1.0-beta.2",
   "description": "Embed Splice harness diagrams on your website",
   "main": "dist/splice-embed.umd.js",
   "module": "dist/splice-embed.es.js",

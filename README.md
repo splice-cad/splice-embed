@@ -7,7 +7,7 @@ Embed Splice harness diagrams on your website with a simple JavaScript library.
 ### CDN (Recommended)
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/@splice-cad/embed@0.1.0-beta.1/dist/splice-embed.iife.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@splice-cad/embed@0.1.0-beta.2/dist/splice-embed.iife.js"></script>
 ```
 
 ### NPM
@@ -24,7 +24,7 @@ npm install @splice-cad/embed
 <!DOCTYPE html>
 <html>
 <head>
-  <script src="https://cdn.jsdelivr.net/npm/@splice-cad/embed@0.1.0-beta.1/dist/splice-embed.iife.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@splice-cad/embed@0.1.0-beta.2/dist/splice-embed.iife.js"></script>
 </head>
 <body>
   <div id="harness-container"></div>
